@@ -12,7 +12,9 @@ Pre-releases are skipped. The Chrome Web Store review still applies to every ver
 
 ## One-time setup
 
-Requirements: 2-Step Verification on the Google account that owns the Chrome Web Store item, and the `gcloud` CLI.
+Requirements: 2-Step Verification on the Google account that owns the Chrome Web Store item, and a recent `gcloud` CLI (`gcloud components update`; version 410 crashes on the workload identity commands).
+
+Current setup (2026-11-23): project `feed-flair-cws-57237`, service account `cws-publisher@feed-flair-cws-57237.iam.gserviceaccount.com`, in the Google account that owns the store item.
 
 ### 1. Google Cloud: project, service account and GitHub federation
 
@@ -21,12 +23,12 @@ PROJECT_ID=feed-flair-cws-$RANDOM   # must be globally unique
 REPO=andremartinelli/reddit-feed-flair
 
 gcloud projects create "$PROJECT_ID"
-gcloud config set project "$PROJECT_ID"
-gcloud services enable chromewebstore.googleapis.com iamcredentials.googleapis.com sts.googleapis.com iam.googleapis.com
-gcloud iam service-accounts create cws-publisher --display-name="Chrome Web Store publisher"
+gcloud services enable chromewebstore.googleapis.com iamcredentials.googleapis.com sts.googleapis.com iam.googleapis.com --project "$PROJECT_ID"
+gcloud iam service-accounts create cws-publisher --display-name="Chrome Web Store publisher" --project "$PROJECT_ID"
 
-gcloud iam workload-identity-pools create github --location=global --display-name="GitHub"
-gcloud iam workload-identity-pools providers create-oidc reddit-feed-flair \
+# Right after creating the project, IAM can answer "permission denied" for a minute or two: wait and retry.
+gcloud iam workload-identity-pools create github --location=global --display-name="GitHub" --project "$PROJECT_ID"
+gcloud iam workload-identity-pools providers create-oidc reddit-feed-flair --project "$PROJECT_ID" \
   --location=global --workload-identity-pool=github \
   --issuer-uri="https://token.actions.githubusercontent.com" \
   --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository" \
@@ -34,7 +36,7 @@ gcloud iam workload-identity-pools providers create-oidc reddit-feed-flair \
 
 PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')
 gcloud iam service-accounts add-iam-policy-binding "cws-publisher@$PROJECT_ID.iam.gserviceaccount.com" \
-  --role=roles/iam.workloadIdentityUser \
+  --project "$PROJECT_ID" --role=roles/iam.workloadIdentityUser \
   --member="principalSet://iam.googleapis.com/projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/github/attribute.repository/$REPO"
 
 echo "GCP_SERVICE_ACCOUNT=cws-publisher@$PROJECT_ID.iam.gserviceaccount.com"
