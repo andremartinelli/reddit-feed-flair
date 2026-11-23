@@ -1,4 +1,4 @@
-# Reddit Feed Flair
+# Feed Flair for Reddit
 
 [English](README.md)
 
@@ -6,7 +6,13 @@ Extensão de navegador que mostra a flair de cada post no feed principal do Redd
 
 O Reddit novo esconde a flair nesses feeds. A extensão põe de volta.
 
+Não oficial. Sem vínculo com o Reddit, Inc., nem aprovação dele.
+
 ## Instalar
+
+Pela Chrome Web Store: em breve.
+
+Pelo código:
 
 Testado no Brave. É uma extensão Manifest V3 comum, então deve funcionar também no Chrome, no Edge e em outros navegadores Chromium.
 
@@ -44,7 +50,7 @@ Os pontos que dependem do HTML do Reddit:
 - `[id*='credit-bar']`, a linha onde a etiqueta entra;
 - `shreddit-post-flair`, a flair que o próprio Reddit desenha.
 
-Erros aparecem no console da página com o prefixo `[Reddit Feed Flair]`.
+Erros aparecem no console da página com o prefixo `[Feed Flair for Reddit]`.
 
 ## Licença
 

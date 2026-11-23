@@ -1,4 +1,4 @@
-# Reddit Feed Flair
+# Feed Flair for Reddit
 
 [Português](README.pt-BR.md)
 
@@ -6,7 +6,13 @@ A browser extension that shows each post's flair on Reddit's main feeds (Home, P
 
 New Reddit hides post flair on these feeds. This extension puts it back.
 
+Unofficial. Not affiliated with or endorsed by Reddit, Inc.
+
 ## Install
+
+From the Chrome Web Store: coming soon.
+
+From source:
 
 Tested in Brave. It is a standard Manifest V3 extension, so it should also work in Chrome, Edge and other Chromium browsers.
 
@@ -44,7 +50,7 @@ The parts that depend on Reddit's HTML:
 - `[id*='credit-bar']`, the line where the badge goes;
 - `shreddit-post-flair`, the flair Reddit draws itself.
 
-Errors show up in the page console with the `[Reddit Feed Flair]` prefix.
+Errors show up in the page console with the `[Feed Flair for Reddit]` prefix.
 
 ## License
 

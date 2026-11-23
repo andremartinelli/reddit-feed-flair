@@ -1,10 +1,10 @@
-// Reddit Feed Flair
+// Feed Flair for Reddit
 // Shows post flair in the lists where new Reddit hides it
 // (Home, Popular, All, custom feeds). Where Reddit already shows it, does nothing.
 (() => {
   'use strict';
 
-  const TAG = '[Reddit Feed Flair]';
+  const TAG = '[Feed Flair for Reddit]';
   const DEBUG = false;        // true: diagnostic panel in the corner of the page
   const CONCURRENCY = 4;      // requests at the same time
   const GAP = 100;            // pause between request rounds (ms)
