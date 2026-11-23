@@ -10,6 +10,8 @@ Publishing a GitHub Release with tag `v<version>` (for example `v1.3.1`) runs `.
 
 Pre-releases are skipped. The Chrome Web Store review still applies to every version.
 
+To check that the setup still works without publishing anything: **Actions › Publish to Chrome Web Store › Run workflow**. It only reads the item's status in the store.
+
 ## One-time setup
 
 Requirements: 2-Step Verification on the Google account that owns the Chrome Web Store item, and a recent `gcloud` CLI (`gcloud components update`; version 410 crashes on the workload identity commands).

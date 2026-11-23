@@ -1,6 +1,7 @@
 #!/bin/sh
 # Uploads a ZIP to the Chrome Web Store and submits it for review (API v2).
 # Usage: CWS_TOKEN=... CWS_PUBLISHER_ID=... CWS_ITEM_ID=... scripts/cws-publish.sh dist/file.zip
+#        scripts/cws-publish.sh --check   (only reads the item status; changes nothing)
 set -eu
 zip="$1"
 api="${CWS_API:-https://chromewebstore.googleapis.com}"
@@ -14,6 +15,11 @@ call() {
   fi
   echo "$out"
 }
+
+if [ "$zip" = "--check" ]; then
+  call "$api/v2/$item:fetchStatus"
+  exit 0
+fi
 
 echo "Uploading $zip"
 res=$(call -X POST -T "$zip" "$api/upload/v2/$item:upload")
