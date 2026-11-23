@@ -52,6 +52,16 @@ Os pontos que dependem do HTML do Reddit:
 
 Erros aparecem no console da página com o prefixo `[Feed Flair for Reddit]`.
 
+## Publicar uma nova versão
+
+1. Mude o código e teste: recarregue a extensão em `brave://extensions` e depois o Reddit.
+2. Aumente `version` no `manifest.json` (por exemplo 1.3.0 → 1.3.1). A Chrome Web Store recusa um pacote com versão que não seja maior que a publicada.
+3. Rode `./build.sh`. Ele cria `dist/feed-flair-for-reddit-<versão>.zip`.
+4. Faça o commit e o push.
+5. No [painel da Chrome Web Store](https://chrome.google.com/webstore/devconsole), abra o item, vá em **Pacote**, envie o ZIP novo e mande para revisão.
+
+Os textos e respostas da loja ficam em `store/listing.md`. Se mudar algo no painel, atualize esse arquivo também.
+
 ## Licença
 
 [MIT](LICENSE)

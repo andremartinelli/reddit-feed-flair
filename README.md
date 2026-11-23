@@ -52,6 +52,16 @@ The parts that depend on Reddit's HTML:
 
 Errors show up in the page console with the `[Feed Flair for Reddit]` prefix.
 
+## Releasing a new version
+
+1. Change the code and test it: reload the extension in `brave://extensions`, then reload Reddit.
+2. Raise `version` in `manifest.json` (for example 1.3.0 → 1.3.1). The Chrome Web Store rejects a package whose version isn't higher than the published one.
+3. Run `./build.sh`. It creates `dist/feed-flair-for-reddit-<version>.zip`.
+4. Commit and push.
+5. In the [Chrome Web Store dashboard](https://chrome.google.com/webstore/devconsole), open the item, go to **Package**, upload the new ZIP and submit it for review.
+
+Store texts and answers live in `store/listing.md`. If you change them in the dashboard, update that file too.
+
 ## License
 
 [MIT](LICENSE)
