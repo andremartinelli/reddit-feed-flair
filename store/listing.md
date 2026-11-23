@@ -69,7 +69,7 @@ The extension only runs on www.reddit.com. It reads the posts on the feed, fetch
 
 **Remote code:** No, I am not using remote code.
 
-**Data usage:** see the note in the session; recommended answer is to check none of the data types, because nothing leaves the browser except the requests to www.reddit.com that the page itself makes. Check the three certifications (no selling, no unrelated use, no creditworthiness use).
+**Data usage:** check none of the data types (decided 2026-11-23): nothing leaves the browser except the requests to www.reddit.com that the page itself makes. Check the three certifications (no selling, no unrelated use, no creditworthiness use).
 
 **Privacy policy URL:**
 
