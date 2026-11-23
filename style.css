@@ -1,0 +1,55 @@
+/* Flex with a fixed height: emoji and text stay centered even with Reddit's CSS on top. */
+.rff-flair {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 3px;
+  flex: none;
+  box-sizing: border-box;
+  height: 20px !important;
+  max-width: 240px;
+  margin-left: 8px;
+  padding: 0 8px !important;
+  overflow: hidden;
+  border-radius: 999px;
+  font-size: 12px !important;
+  font-weight: 500;
+  line-height: 20px !important;
+  white-space: nowrap;
+  background-color: rgba(128, 128, 128, 0.2);
+  color: inherit;
+}
+
+.rff-flair .rff-text {
+  display: block !important;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 20px !important;
+}
+
+#rff-debug {
+  position: fixed;
+  top: 60px;
+  right: 10px;
+  z-index: 2147483647;
+  max-width: 620px;
+  margin: 0;
+  padding: 8px 10px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font: 12px/1.4 Menlo, monospace;
+  background: #ffeb3b;
+  color: #000;
+  border: 2px solid #000;
+}
+
+/* Reddit's CSS makes <img> a block; here the emoji stays on the text line. */
+.rff-flair .rff-emoji {
+  display: block !important;
+  flex: none;
+  width: 16px !important;
+  height: 16px !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
