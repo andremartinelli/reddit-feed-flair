@@ -56,9 +56,10 @@ Erros aparecem no console da página com o prefixo `[Feed Flair for Reddit]`.
 
 1. Mude o código e teste: recarregue a extensão em `brave://extensions` e depois o Reddit.
 2. Aumente `version` no `manifest.json` (por exemplo 1.3.0 → 1.3.1). A Chrome Web Store recusa um pacote com versão que não seja maior que a publicada.
-3. Rode `./build.sh`. Ele cria `dist/feed-flair-for-reddit-<versão>.zip`.
-4. Faça o commit e o push.
-5. No [painel da Chrome Web Store](https://chrome.google.com/webstore/devconsole), abra o item, vá em **Pacote**, envie o ZIP novo e mande para revisão.
+3. Faça o commit e o push.
+4. Crie um GitHub Release com a tag `v<versão>`, por exemplo `gh release create v1.3.1 --generate-notes`. O workflow **Publish to Chrome Web Store** gera o ZIP e manda para revisão. Configuração e detalhes: `store/automation.md`.
+
+Plano B manual: rode `./build.sh` e envie `dist/feed-flair-for-reddit-<versão>.zip` no [painel da Chrome Web Store](https://chrome.google.com/webstore/devconsole), na aba **Pacote** do item.
 
 Os textos e respostas da loja ficam em `store/listing.md`. Se mudar algo no painel, atualize esse arquivo também.
 

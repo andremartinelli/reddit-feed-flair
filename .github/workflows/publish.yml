@@ -1,0 +1,52 @@
+name: Publish to Chrome Web Store
+
+# Runs when a GitHub Release is published. The release tag must be "v" + the
+# version in manifest.json (e.g. v1.3.1). Setup: store/automation.md.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write # lets the Google auth step get a token without a stored key
+
+jobs:
+  publish:
+    if: ${{ !github.event.release.prerelease }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Check that the tag matches manifest.json
+        run: |
+          version=$(jq -r .version manifest.json)
+          if [ "$GITHUB_REF_NAME" != "v$version" ]; then
+            echo "::error::Release tag $GITHUB_REF_NAME does not match manifest.json version $version (expected v$version)."
+            exit 1
+          fi
+
+      - name: Check syntax
+        run: |
+          node --check content.js
+          for f in manifest.json _locales/*/messages.json; do jq empty "$f"; done
+
+      - name: Build ZIP
+        id: build
+        run: echo "zip=$(./build.sh)" >> "$GITHUB_OUTPUT"
+
+      - name: Get a Chrome Web Store token
+        id: auth
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+          token_format: access_token
+          access_token_scopes: https://www.googleapis.com/auth/chromewebstore
+
+      - name: Upload and submit for review
+        env:
+          CWS_TOKEN: ${{ steps.auth.outputs.access_token }}
+          CWS_PUBLISHER_ID: ${{ vars.CWS_PUBLISHER_ID }}
+          CWS_ITEM_ID: ${{ vars.CWS_ITEM_ID }}
+          ZIP: ${{ steps.build.outputs.zip }}
+        run: scripts/cws-publish.sh "$ZIP"
