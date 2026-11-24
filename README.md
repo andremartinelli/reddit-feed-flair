@@ -65,6 +65,12 @@ Manual fallback: run `./build.sh` and upload `dist/feed-flair-for-reddit-<versio
 
 Store texts and answers live in `store/listing.md`. If you change them in the dashboard, update that file too.
 
+## Claude Code cloud sessions
+
+`scripts/cloud-setup.sh` prepares a cloud session: it installs `jq` and `zip` if missing and checks for Node, the same tools CI uses. It is idempotent and has nothing to configure: no services, no `.env`, no secrets. The SessionStart hook in `.claude/settings.json` runs it only when `CLAUDE_CODE_REMOTE=true`, so local sessions are unchanged. Instructions for Claude live in `CLAUDE.md`.
+
+Publishing stays in GitHub Actions; cloud sessions never get Chrome Web Store credentials.
+
 ## License
 
 [MIT](LICENSE)

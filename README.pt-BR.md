@@ -65,6 +65,12 @@ Plano B manual: rode `./build.sh` e envie `dist/feed-flair-for-reddit-<versão>.
 
 Os textos e respostas da loja ficam em `store/listing.md`. Se mudar algo no painel, atualize esse arquivo também.
 
+## Sessões do Claude Code na nuvem
+
+`scripts/cloud-setup.sh` prepara uma sessão na nuvem: instala `jq` e `zip` se faltarem e confere o Node, as mesmas ferramentas do CI. É idempotente e não tem nada a configurar: sem serviços, sem `.env`, sem segredos. O hook SessionStart em `.claude/settings.json` só o roda quando `CLAUDE_CODE_REMOTE=true`, então sessões locais não mudam. As instruções para o Claude ficam em `CLAUDE.md`.
+
+A publicação continua só no GitHub Actions; sessões na nuvem nunca recebem credenciais da Chrome Web Store.
+
 ## Licença
 
 [MIT](LICENSE)
