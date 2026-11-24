@@ -10,9 +10,9 @@ Não oficial. Sem vínculo com o Reddit, Inc., nem aprovação dele.
 
 ## Instalar
 
-Pela Chrome Web Store: em breve.
+Pela Chrome Web Store: [Feed Flair for Reddit](https://chromewebstore.google.com/detail/ljipmpigkkjkbodimengbbacakngcceo).
 
-Pelo código:
+Pelo código (para usar o código mais novo antes do lançamento):
 
 Testado no Brave. É uma extensão Manifest V3 comum, então deve funcionar também no Chrome, no Edge e em outros navegadores Chromium.
 
@@ -23,6 +23,8 @@ Testado no Brave. É uma extensão Manifest V3 comum, então deve funcionar tamb
 5. Recarregue o reddit.com.
 
 Depois de mudar algum arquivo, clique no botão de recarregar do card da extensão e recarregue o Reddit.
+
+Não deixe a versão da loja instalada no mesmo navegador: as duas rodariam juntas, cada post seria buscado duas vezes e a versão da loja pode desenhar a etiqueta antes da sua.
 
 ## Como funciona
 

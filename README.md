@@ -10,9 +10,9 @@ Unofficial. Not affiliated with or endorsed by Reddit, Inc.
 
 ## Install
 
-From the Chrome Web Store: coming soon.
+From the Chrome Web Store: [Feed Flair for Reddit](https://chromewebstore.google.com/detail/ljipmpigkkjkbodimengbbacakngcceo).
 
-From source:
+From source (to run the latest code before it is released):
 
 Tested in Brave. It is a standard Manifest V3 extension, so it should also work in Chrome, Edge and other Chromium browsers.
 
@@ -23,6 +23,8 @@ Tested in Brave. It is a standard Manifest V3 extension, so it should also work 
 5. Reload reddit.com.
 
 After changing any file, click the reload button on the extension's card and reload Reddit.
+
+Don't keep the store version installed in the same browser: both copies would run, each post would be fetched twice, and the store copy may draw the badge before yours.
 
 ## How it works
 
