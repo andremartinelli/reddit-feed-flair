@@ -14,6 +14,8 @@ Pela Chrome Web Store: [Feed Flair for Reddit](https://chromewebstore.google.com
 
 Pelo código (para usar o código mais novo antes do lançamento):
 
+### Navegadores Chromium (Brave, Chrome, Edge)
+
 Testado no Brave. É uma extensão Manifest V3 comum, então deve funcionar também no Chrome, no Edge e em outros navegadores Chromium.
 
 1. Baixe ou clone este repositório.
@@ -23,6 +25,17 @@ Testado no Brave. É uma extensão Manifest V3 comum, então deve funcionar tamb
 5. Recarregue o reddit.com.
 
 Depois de mudar algum arquivo, clique no botão de recarregar do card da extensão e recarregue o Reddit.
+
+### Firefox
+
+Precisa do Firefox 140 ou mais novo, no computador.
+
+1. Baixe ou clone este repositório.
+2. Abra `about:debugging#/runtime/this-firefox`.
+3. Clique em **Carregar extensão temporária…** e escolha o `manifest.json` da pasta `reddit-feed-flair`.
+4. Recarregue o reddit.com.
+
+O Firefox remove a extensão temporária quando fecha, então carregue de novo depois de reiniciar. Depois de mudar algum arquivo, clique em **Recarregar** no card da extensão em `about:debugging` e recarregue o Reddit. Se nenhuma etiqueta aparecer, clique no botão de extensões (peça de quebra-cabeça) na barra e permita a extensão no www.reddit.com.
 
 Não deixe a versão da loja instalada no mesmo navegador: as duas rodariam juntas, cada post seria buscado duas vezes e a versão da loja pode desenhar a etiqueta antes da sua.
 
@@ -56,20 +69,21 @@ Erros aparecem no console da página com o prefixo `[Feed Flair for Reddit]`.
 
 ## Publicar uma nova versão
 
-1. Mude o código e teste: recarregue a extensão em `brave://extensions` e depois o Reddit.
-2. Aumente `version` no `manifest.json` (por exemplo 1.3.0 → 1.3.1). A Chrome Web Store recusa um pacote com versão que não seja maior que a publicada.
+1. Mude o código e teste: recarregue a extensão em `brave://extensions` e depois o Reddit. Teste também no Firefox (veja "Instalar").
+2. Aumente `version` no `manifest.json` (por exemplo 1.3.0 → 1.3.1). As duas lojas recusam um pacote com versão que não seja maior que a publicada.
 3. Faça o commit e o push.
-4. Crie um GitHub Release com a tag `v<versão>`, por exemplo `gh release create v1.3.1 --generate-notes`. O workflow **Publish to Chrome Web Store** gera o ZIP e manda para revisão. Configuração e detalhes: `store/automation.md`.
+4. Chrome Web Store: crie um GitHub Release com a tag `v<versão>`, por exemplo `gh release create v1.3.1 --generate-notes`. O workflow **Publish to Chrome Web Store** gera o ZIP e manda para revisão. Configuração e detalhes: `store/automation.md`.
+5. Firefox Add-ons: rode `./build.sh` e envie o mesmo ZIP no [Add-on Developer Hub](https://addons.mozilla.org/developers/addons), em **Upload New Version** na página da extensão. Passo a passo: `store/listing-firefox.md`.
 
-Plano B manual: rode `./build.sh` e envie `dist/feed-flair-for-reddit-<versão>.zip` no [painel da Chrome Web Store](https://chrome.google.com/webstore/devconsole), na aba **Pacote** do item.
+Plano B manual do Chrome: rode `./build.sh` e envie `dist/feed-flair-for-reddit-<versão>.zip` no [painel da Chrome Web Store](https://chrome.google.com/webstore/devconsole), na aba **Pacote** do item.
 
-Os textos e respostas da loja ficam em `store/listing.md`. Se mudar algo no painel, atualize esse arquivo também.
+Os textos e respostas das lojas ficam em `store/listing.md` (Chrome) e `store/listing-firefox.md` (Firefox). Se mudar algo num painel, atualize o arquivo correspondente também.
 
 ## Sessões do Claude Code na nuvem
 
 `scripts/cloud-setup.sh` prepara uma sessão na nuvem: instala `jq` e `zip` se faltarem e confere o Node, as mesmas ferramentas do CI. É idempotente e não tem nada a configurar: sem serviços, sem `.env`, sem segredos. O hook SessionStart em `.claude/settings.json` só o roda quando `CLAUDE_CODE_REMOTE=true`, então sessões locais não mudam. As instruções para o Claude ficam em `CLAUDE.md`.
 
-A publicação continua só no GitHub Actions; sessões na nuvem nunca recebem credenciais da Chrome Web Store.
+A publicação fica fora das sessões na nuvem: GitHub Actions para a Chrome Web Store, envio manual para o Firefox Add-ons. Sessões na nuvem nunca recebem credenciais das lojas.
 
 ## Licença
 

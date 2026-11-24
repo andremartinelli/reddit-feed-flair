@@ -1,5 +1,5 @@
 #!/bin/sh
-# Builds the Chrome Web Store package: dist/feed-flair-for-reddit-<version>.zip
+# Builds the store package (Chrome Web Store and Firefox Add-ons): dist/feed-flair-for-reddit-<version>.zip
 set -e
 cd "$(dirname "$0")"
 version=$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' manifest.json)

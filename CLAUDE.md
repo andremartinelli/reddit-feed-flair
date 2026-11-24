@@ -12,7 +12,7 @@ for f in manifest.json _locales/*/messages.json; do jq empty "$f"; done
 ```
 
 There are no unit tests. Behavior is tested by loading the unpacked extension
-in a Chromium browser (see README "Install").
+in a Chromium browser or in Firefox (see README "Install").
 
 Cloud sessions: `scripts/cloud-setup.sh` installs what is missing (jq, zip) and
 runs from the SessionStart hook in `.claude/settings.json` only when
@@ -23,6 +23,8 @@ runs from the SessionStart hook in `.claude/settings.json` only when
 - Never create a GitHub Release or tag, and never run the "Publish to Chrome
   Web Store" workflow (`.github/workflows/publish.yml`), not even its check job.
 - Never run `scripts/cws-publish.sh` or call the Chrome Web Store API.
+- Never submit to Firefox Add-ons (addons.mozilla.org) or call its API,
+  including `web-ext sign`.
 - Never ask for, print or store secrets or the `GCP_*`/`CWS_*` values.
 - Don't raise `version` in `manifest.json` unless asked.
 

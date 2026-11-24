@@ -14,6 +14,8 @@ From the Chrome Web Store: [Feed Flair for Reddit](https://chromewebstore.google
 
 From source (to run the latest code before it is released):
 
+### Chromium browsers (Brave, Chrome, Edge)
+
 Tested in Brave. It is a standard Manifest V3 extension, so it should also work in Chrome, Edge and other Chromium browsers.
 
 1. Download or clone this repository.
@@ -23,6 +25,17 @@ Tested in Brave. It is a standard Manifest V3 extension, so it should also work 
 5. Reload reddit.com.
 
 After changing any file, click the reload button on the extension's card and reload Reddit.
+
+### Firefox
+
+Requires Firefox 140 or later, on desktop.
+
+1. Download or clone this repository.
+2. Open `about:debugging#/runtime/this-firefox`.
+3. Click **Load Temporary Add-on…** and pick `manifest.json` in the `reddit-feed-flair` folder.
+4. Reload reddit.com.
+
+Firefox removes a temporary add-on when it closes, so load it again after a restart. After changing any file, click **Reload** on the extension's card in `about:debugging` and reload Reddit. If no badge shows up, click the extensions button (puzzle piece) in the toolbar and allow the extension on www.reddit.com.
 
 Don't keep the store version installed in the same browser: both copies would run, each post would be fetched twice, and the store copy may draw the badge before yours.
 
@@ -56,20 +69,21 @@ Errors show up in the page console with the `[Feed Flair for Reddit]` prefix.
 
 ## Releasing a new version
 
-1. Change the code and test it: reload the extension in `brave://extensions`, then reload Reddit.
-2. Raise `version` in `manifest.json` (for example 1.3.0 → 1.3.1). The Chrome Web Store rejects a package whose version isn't higher than the published one.
+1. Change the code and test it: reload the extension in `brave://extensions`, then reload Reddit. Test it in Firefox too (see "Install").
+2. Raise `version` in `manifest.json` (for example 1.3.0 → 1.3.1). Both stores reject a package whose version isn't higher than the published one.
 3. Commit and push.
-4. Create a GitHub Release with tag `v<version>`, for example `gh release create v1.3.1 --generate-notes`. The **Publish to Chrome Web Store** workflow builds the ZIP and submits it for review. Setup and details: `store/automation.md`.
+4. Chrome Web Store: create a GitHub Release with tag `v<version>`, for example `gh release create v1.3.1 --generate-notes`. The **Publish to Chrome Web Store** workflow builds the ZIP and submits it for review. Setup and details: `store/automation.md`.
+5. Firefox Add-ons: run `./build.sh` and upload the same ZIP in the [Add-on Developer Hub](https://addons.mozilla.org/developers/addons), with **Upload New Version** on the add-on's page. Step by step: `store/listing-firefox.md`.
 
-Manual fallback: run `./build.sh` and upload `dist/feed-flair-for-reddit-<version>.zip` in the [Chrome Web Store dashboard](https://chrome.google.com/webstore/devconsole), on the item's **Package** tab.
+Chrome manual fallback: run `./build.sh` and upload `dist/feed-flair-for-reddit-<version>.zip` in the [Chrome Web Store dashboard](https://chrome.google.com/webstore/devconsole), on the item's **Package** tab.
 
-Store texts and answers live in `store/listing.md`. If you change them in the dashboard, update that file too.
+Store texts and answers live in `store/listing.md` (Chrome) and `store/listing-firefox.md` (Firefox). If you change them in a dashboard, update the matching file too.
 
 ## Claude Code cloud sessions
 
 `scripts/cloud-setup.sh` prepares a cloud session: it installs `jq` and `zip` if missing and checks for Node, the same tools CI uses. It is idempotent and has nothing to configure: no services, no `.env`, no secrets. The SessionStart hook in `.claude/settings.json` runs it only when `CLAUDE_CODE_REMOTE=true`, so local sessions are unchanged. Instructions for Claude live in `CLAUDE.md`.
 
-Publishing stays in GitHub Actions; cloud sessions never get Chrome Web Store credentials.
+Publishing stays out of cloud sessions: GitHub Actions for the Chrome Web Store, a manual upload for Firefox Add-ons. Cloud sessions never get store credentials.
 
 ## License
 
