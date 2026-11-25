@@ -59,6 +59,16 @@ https://github.com/andremartinelli/reddit-feed-flair/issues
 No build step: the ZIP is the source as written (content.js, style.css, manifest.json, _locales, icons). Source: https://github.com/andremartinelli/reddit-feed-flair
 
 How to test: open https://www.reddit.com/ (Home, r/popular or r/all). Posts whose flair Reddit hides on these feeds get a badge next to "r/subreddit • time". The content script only runs on www.reddit.com and only fetches www.reddit.com/comments/<id>.json (or the post page as a fallback). It caches the flair in storage.local for 24 hours. No remote code, no other hosts.
+
+No Reddit account is needed: open https://www.reddit.com/r/popular/ logged out and the flair badges show up next to "r/subreddit • time".
+```
+
+Never put a real Reddit username or password here. AMO's checklist asks for a test account only when one is needed, and this extension doesn't need one.
+
+**Release notes** (first version):
+
+```
+First release on Firefox Add-ons. Shows each post's flair on Reddit's Home, Popular, All and custom feeds, with the original text, emojis and colors. Same features as version 1.3.0 on the Chrome Web Store.
 ```
 
 ## After the first approval
@@ -78,4 +88,4 @@ How to test: open https://www.reddit.com/ (Home, r/popular or r/all). Posts whos
 
 1. Raise `version` in `manifest.json`. AMO rejects a version that isn't higher than the published one.
 2. Run `./build.sh`.
-3. In the Developer Hub, open the add-on and click **Upload New Version**. Give the same answers as above: Firefox only, no source code.
+3. In the Developer Hub, open the add-on and click **Upload New Version**. Give the same answers as above: Firefox only, no source code. Write release notes about what changed, and keep the notes to reviewer.
