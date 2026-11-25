@@ -4,7 +4,11 @@
 # Usage: AMO_JWT_ISSUER=... AMO_JWT_SECRET=... [RELEASE_NOTES=...] scripts/amo-publish.sh dist/file.zip
 #        scripts/amo-publish.sh --check   (only reads the add-on status; changes nothing)
 # The notes for Mozilla reviewers come from store/amo-approval-notes.txt.
+# If the version is already on AMO (for example, when re-running a job), it exits 0 without uploading.
 # API docs: https://mozilla.github.io/addons-server/topics/api/addons.html
+#
+# JSON is printed with printf, never echo: dash's echo (the /bin/sh on Ubuntu)
+# turns the "\n" inside JSON strings into real newlines, and jq rejects that.
 set -eu
 arg="${1:?usage: scripts/amo-publish.sh <zip> | --check}"
 : "${AMO_JWT_ISSUER:?AMO_JWT_ISSUER is not set}"
@@ -31,56 +35,93 @@ jwt() {
   '
 }
 
-# Prints the response body; on an HTTP error prints it to stderr and fails.
-# The Authorization header goes in through stdin, not the command line.
-call() {
-  if ! out=$(printf 'Authorization: JWT %s\n' "$(jwt)" | curl -sS --fail-with-body -H @- "$@"); then
-    echo "$out" >&2
-    return 1
-  fi
-  echo "$out"
+# curl with the Authorization header, which goes in through stdin, not the command line.
+amo_curl() {
+  printf 'Authorization: JWT %s\n' "$(jwt)" | curl -sS -H @- "$@"
 }
 
-# Results go through a variable before jq: in a pipeline a failed call would
-# go unnoticed, because sh only checks the last command.
+# Prints the response body; on an HTTP error prints it to stderr and fails.
+# Callers keep the result in a variable before using jq: in a pipeline a failed
+# call would go unnoticed, because sh only checks the last command.
+call() {
+  if ! out=$(amo_curl --fail-with-body "$@"); then
+    printf '%s\n' "$out" >&2
+    return 1
+  fi
+  printf '%s\n' "$out"
+}
+
+# Same as call, but tries 3 times, 5 s apart (for reads that are safe to repeat).
+call_retry() {
+  for attempt in 1 2 3; do
+    if out=$(call "$@"); then
+      printf '%s\n' "$out"
+      return 0
+    fi
+    [ "$attempt" -lt 3 ] && sleep 5
+  done
+  return 1
+}
+
 if [ "$arg" = "--check" ]; then
-  out=$(call "$addon/")
-  echo "$out" | jq '{
-    guid, slug, status,
-    current_version: .current_version.version,
-    latest_listed_version: .latest_listed_version.version,
-    latest_listed_file_status: .latest_listed_version.file.status
+  detail=$(call "$addon/")
+  latest=$(call "$addon/versions/?filter=all_without_unlisted&page_size=1")
+  jq -n --argjson a "$detail" --argjson v "$latest" '{
+    guid: $a.guid, slug: $a.slug, status: $a.status,
+    current_version: $a.current_version.version,
+    latest_listed_version: $v.results[0].version,
+    latest_listed_file_status: $v.results[0].file.status
   }'
   exit 0
 fi
 
 zip="$arg"
-echo "Uploading $zip"
+version=$(unzip -p "$zip" manifest.json | jq -r '.version')
+
+# Stop early if this version was already submitted (a re-run after a partial failure).
+tmp=$(mktemp)
+trap 'rm -f "$tmp"' EXIT
+code=$(amo_curl -o "$tmp" -w '%{http_code}' "$addon/versions/v$version/")
+case "$code" in
+  200)
+    echo "Version $version is already on Firefox Add-ons (file status: $(jq -r '.file.status' "$tmp")). Nothing to upload."
+    exit 0
+    ;;
+  404) ;;
+  *)
+    cat "$tmp" >&2
+    echo >&2
+    echo "::error::Could not check whether version $version exists (HTTP $code)" >&2
+    exit 1
+    ;;
+esac
+
+echo "Uploading $zip (version $version)"
 res=$(call -F "upload=@$zip" -F "channel=listed" "$api/addons/upload/")
-uuid=$(echo "$res" | jq -r '.uuid')
+uuid=$(printf '%s\n' "$res" | jq -r '.uuid')
 
 # Validation runs asynchronously: poll for up to 5 minutes.
 tries=0
-while [ "$(echo "$res" | jq -r '.processed')" != "true" ] && [ "$tries" -lt 60 ]; do
+while [ "$(printf '%s\n' "$res" | jq -r '.processed')" != "true" ] && [ "$tries" -lt 60 ]; do
   sleep 5
   tries=$((tries + 1))
-  res=$(call "$api/addons/upload/$uuid/")
+  res=$(call_retry "$api/addons/upload/$uuid/")
 done
-echo "$res" | jq -r '.validation.messages[]? | "\(.type): \(.message)"'
-if [ "$(echo "$res" | jq -r '.processed')" != "true" ]; then
+printf '%s\n' "$res" | jq -r '.validation.messages[]? | "\(.type): \(.message)"'
+if [ "$(printf '%s\n' "$res" | jq -r '.processed')" != "true" ]; then
   echo "::error::Validation did not finish in 5 minutes (upload $uuid)" >&2
   exit 1
 fi
-if [ "$(echo "$res" | jq -r '.valid')" != "true" ]; then
+if [ "$(printf '%s\n' "$res" | jq -r '.valid')" != "true" ]; then
   echo "::error::The package failed AMO validation (see the messages above)" >&2
   exit 1
 fi
 
-echo "Submitting version $(echo "$res" | jq -r '.version') for review"
+echo "Submitting version $version for review"
 notes=$(printf '%s' "${RELEASE_NOTES:-}" | tr -d '\r')
 body=$(jq -n --arg upload "$uuid" --arg notes "$notes" \
   --rawfile approval "$root/store/amo-approval-notes.txt" '
   { upload: $upload, compatibility: ["firefox"], approval_notes: $approval }
   + (if ($notes | length) > 0 then { release_notes: { "en-US": $notes } } else {} end)')
 out=$(call -H 'Content-Type: application/json' --data-binary "$body" "$addon/versions/")
-echo "$out" | jq '{ id, version, channel, file_status: .file.status }'
+printf '%s\n' "$out" | jq '{ id, version, channel, file_status: .file.status }'

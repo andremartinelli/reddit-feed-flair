@@ -72,19 +72,26 @@ gh variable set CWS_ITEM_ID --body "<item-id>"
 1. checks that the tag matches `version` in `manifest.json`;
 2. checks the syntax of `content.js` and the JSON files;
 3. builds the ZIP with `build.sh` (the same package as the Chrome Web Store);
-4. runs `scripts/amo-publish.sh`, which uploads the ZIP to Firefox Add-ons (API v5), waits for the automatic validation and submits it as a new version for Firefox desktop. The release text becomes the version's release notes, and `store/amo-approval-notes.txt` becomes the notes for Mozilla reviewers. It goes live once Mozilla approves it.
+4. runs `scripts/amo-publish.sh`, which uploads the ZIP to Firefox Add-ons (API v5), waits for the automatic validation and submits it as a new version for Firefox desktop. The release text becomes the version's release notes, and `store/amo-approval-notes.txt` becomes the notes for Mozilla reviewers. It goes live once Mozilla approves it. If that version is already on Firefox Add-ons, for example when re-running a failed job, it stops without uploading anything.
 
-Firefox Add-ons has no keyless login like Google's, so the workflow uses an API key stored as secrets of the GitHub environment `amo`. The environment only accepts `main` and `v*` tags, so a workflow running on any other branch, such as the ones Claude Code sessions push, can't read the key. That matters because the key works for the whole Firefox Add-ons account, not only this add-on.
+Firefox Add-ons has no keyless login like Google's, so the workflow uses an API key stored as secrets of the GitHub environment `amo`. That matters because the key works for the whole Firefox Add-ons account, not only this add-on. Two layers keep it away from code that wasn't reviewed:
+
+- the environment only gives the key to workflows running on `main` or on a `v*` tag, so a workflow on any other branch can't read it;
+- two rulesets let only repository admins create `v*` tags or push straight to `main`. Without them, anyone who can push a `v*` tag (pointing at any commit) or push to `main` could run a workflow that reads the key.
 
 To check that the setup works without publishing anything: **Actions › Publish to Firefox Add-ons › Run workflow** on `main`. It only reads the add-on's status.
 
 ### One-time setup
 
 1. **API key.** In the [Add-on Developer Hub](https://addons.mozilla.org/developers/addon/api/key/) (Tools › Manage API Keys), generate new credentials. Keep the page open: you need the **JWT issuer** (looks like `user:12345:67`) and the **JWT secret**.
-2. **Environment.** On GitHub: the repository's **Settings › Environments › New environment**, name `amo`.
-3. **Who can use it.** In the `amo` environment, under **Deployment branches and tags**, choose **Selected branches and tags** and add two rules: branch `main` and tag `v*`.
+2. **Environment.** On GitHub: the repository's **Settings › Environments**. Open `amo` if it's already listed (GitHub creates it, with no rules, the first time a job asks for it); otherwise **New environment**, name `amo`.
+3. **Who can use it.** In the `amo` environment, under **Deployment branches and tags**, choose **Selected branches and tags** and add two rules: branch `main` and tag `v*`. Check that both rules are listed.
 4. **Secrets.** In the same environment, under **Environment secrets**, add `AMO_JWT_ISSUER` (the JWT issuer) and `AMO_JWT_SECRET` (the JWT secret). From a terminal, `gh secret set AMO_JWT_ISSUER --env amo` and `gh secret set AMO_JWT_SECRET --env amo` ask for each value without showing it.
-5. **Test.** Once the workflow is on `main`, run **Actions › Publish to Firefox Add-ons › Run workflow**. A working setup prints the add-on's `guid`, `status` and latest version. `401` means a wrong issuer or secret.
+5. **Release tags.** **Settings › Rules › Rulesets › New ruleset › New tag ruleset**: name `release tags`, enforcement **Active**, bypass list **Repository admin**, target tags by pattern `v*`, and check **Restrict creations**, **Restrict updates** and **Restrict deletions**.
+6. **Main branch.** **New ruleset › New branch ruleset**: name `main`, enforcement **Active**, bypass list **Repository admin**, target the default branch, and check **Restrict deletions**, **Block force pushes** and **Require a pull request before merging**. Skip this step if `main` already has rules like these.
+7. **Test.** Once the workflow is on `main`, run **Actions › Publish to Firefox Add-ons › Run workflow**. A working setup prints the add-on's `guid`, `status` and latest listed version. `401` means a wrong issuer or secret.
+
+Optional, for one more lock: in the `amo` environment, add yourself under **Required reviewers**. Each Firefox run then waits until you click **Approve** in the Actions tab.
 
 If the key leaks, revoke it on the same Developer Hub page and repeat steps 1 and 4.
 
@@ -94,4 +101,4 @@ If the key leaks, revoke it on the same Developer Hub page and repeat steps 1 an
 2. Create the release with a short note for users: `gh release create v<version> --notes "Fixes flair colors in dark mode."` (or on GitHub: Releases › Draft a new release). The note becomes the release notes on Firefox Add-ons, so avoid `--generate-notes`, which writes a list of pull requests.
 3. Follow both runs in the repository's **Actions** tab.
 
-If a run fails, the error is in the failed step's log. The manual fallback is still `./build.sh` plus an upload in that store's dashboard, with the same version: the other store may already have it.
+If a run fails, the error is in the failed step's log. Re-running the Firefox job is safe: if the version already reached Firefox Add-ons, the script says so and stops. The manual fallback is still `./build.sh` plus an upload in that store's dashboard, with the same version (the other store may already have it). Check the store's dashboard first, because a store rejects a version it already has.

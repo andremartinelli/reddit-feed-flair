@@ -82,7 +82,7 @@ Os textos e respostas das lojas ficam em `store/listing.md` (Chrome) e `store/li
 
 `scripts/cloud-setup.sh` prepara uma sessão na nuvem: instala `jq` e `zip` se faltarem e confere o Node, as mesmas ferramentas do CI. É idempotente e não tem nada a configurar: sem serviços, sem `.env`, sem segredos. O hook SessionStart em `.claude/settings.json` só o roda quando `CLAUDE_CODE_REMOTE=true`, então sessões locais não mudam. As instruções para o Claude ficam em `CLAUDE.md`.
 
-A publicação continua só no GitHub Actions; sessões na nuvem nunca recebem credenciais das lojas. A chave do Firefox Add-ons fica no environment `amo`, que só o `main` e as tags `v*` podem usar, então workflows de outros branches não conseguem lê-la.
+A publicação continua só no GitHub Actions; sessões na nuvem nunca recebem credenciais das lojas. A chave do Firefox Add-ons fica no environment `amo`, que só o `main` e as tags `v*` podem usar. Rulesets deixam só admins criarem essas tags ou fazerem push direto no `main` (veja `store/automation.md`), então código de outros branches não consegue ler a chave.
 
 ## Licença
 

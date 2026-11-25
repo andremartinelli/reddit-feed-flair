@@ -82,7 +82,7 @@ Store texts and answers live in `store/listing.md` (Chrome) and `store/listing-f
 
 `scripts/cloud-setup.sh` prepares a cloud session: it installs `jq` and `zip` if missing and checks for Node, the same tools CI uses. It is idempotent and has nothing to configure: no services, no `.env`, no secrets. The SessionStart hook in `.claude/settings.json` runs it only when `CLAUDE_CODE_REMOTE=true`, so local sessions are unchanged. Instructions for Claude live in `CLAUDE.md`.
 
-Publishing stays in GitHub Actions; cloud sessions never get store credentials. The Firefox Add-ons key lives in the `amo` environment, which only `main` and `v*` tags can use, so workflows on other branches can't read it.
+Publishing stays in GitHub Actions; cloud sessions never get store credentials. The Firefox Add-ons key lives in the `amo` environment, which only `main` and `v*` tags can use. Rulesets let only admins create those tags or push straight to `main` (see `store/automation.md`), so code on other branches can't read the key.
 
 ## License
 

@@ -5,7 +5,8 @@ name: Publish to Firefox Add-ons
 # notes on Firefox Add-ons. Setup: store/automation.md.
 #
 # The AMO API key lives in the "amo" environment, which only main and v* tags
-# can use, so workflows on other branches can't read it.
+# can use. Rulesets keep both admin-only (store/automation.md), so code on other
+# branches can't read the key.
 on:
   release:
     types: [published]
@@ -50,7 +51,9 @@ jobs:
 
       - name: Build ZIP
         id: build
-        run: echo "zip=$(./build.sh)" >> "$GITHUB_OUTPUT"
+        run: |
+          zip=$(./build.sh)
+          echo "zip=$zip" >> "$GITHUB_OUTPUT"
 
       - name: Upload and submit for review
         env:
