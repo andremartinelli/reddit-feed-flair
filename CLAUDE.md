@@ -28,14 +28,20 @@ runs from the SessionStart hook in `.claude/settings.json` only when
 - Don't offer to fill in the Chrome Web Store developer dashboard: no browser
   Claude has can operate it (the app's browser doesn't load the page, and
   Claude in Chrome fails with "The extensions gallery cannot be scripted").
-  To update the store, prepare the ZIP (`./build.sh`) and the texts in
-  `store/listing.md`, then give the owner a numbered list of steps to do in
-  the dashboard.
+  To update the store, prepare the ZIP (`./build.sh`) and the texts from the
+  owner's private notes (see "Publishing"), then give the owner a numbered
+  list of steps to do in the dashboard.
 - Never submit to Firefox Add-ons (addons.mozilla.org) or call its API,
   including `web-ext sign` and `scripts/amo-publish.sh`. Testing that script
   against a local fake server through `AMO_API` is fine.
 - Never ask for, print or store secrets or the `GCP_*`/`CWS_*`/`AMO_*` values.
 - Don't raise `version` in `manifest.json` unless asked.
+
+## Publishing
+
+Store listings, the Google Cloud and GitHub setup for publishing, and the release
+runbook live outside this public repo, in the owner's private notes (folder
+`projetos/reddit-feed-flair`).
 
 ## Working rules
 
