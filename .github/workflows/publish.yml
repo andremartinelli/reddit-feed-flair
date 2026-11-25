@@ -1,7 +1,9 @@
 name: Publish to Chrome Web Store
 
 # Runs when a GitHub Release is published. The release tag must be "v" + the
-# version in manifest.json (e.g. v1.3.1). Setup: store/automation.md.
+# version in manifest.json (e.g. v1.3.1). Needs the repository variables
+# GCP_WORKLOAD_IDENTITY_PROVIDER, GCP_SERVICE_ACCOUNT, CWS_PUBLISHER_ID and
+# CWS_ITEM_ID (none of them secret).
 on:
   release:
     types: [published]

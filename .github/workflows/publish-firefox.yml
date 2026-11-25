@@ -1,0 +1,65 @@
+name: Publish to Firefox Add-ons
+
+# Runs when a GitHub Release is published. The release tag must be "v" + the
+# version in manifest.json (e.g. v1.3.1). The release text becomes the release
+# notes on Firefox Add-ons.
+#
+# Needs the "amo" environment, limited to branch main and tags v*, with the
+# secrets AMO_JWT_ISSUER and AMO_JWT_SECRET (an AMO API key, valid for the whole
+# account). Rulesets keep v* tags and pushes to main admin-only, so code on
+# other branches can't read the key.
+on:
+  release:
+    types: [published]
+  workflow_dispatch: # "Run workflow" button: only checks the setup, publishes nothing
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: amo
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Read the add-on status
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: scripts/amo-publish.sh --check
+
+  publish:
+    if: github.event_name == 'release' && !github.event.release.prerelease
+    runs-on: ubuntu-latest
+    environment: amo
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Check that the tag matches manifest.json
+        run: |
+          version=$(jq -r .version manifest.json)
+          if [ "$GITHUB_REF_NAME" != "v$version" ]; then
+            echo "::error::Release tag $GITHUB_REF_NAME does not match manifest.json version $version (expected v$version)."
+            exit 1
+          fi
+
+      - name: Check syntax
+        run: |
+          node --check content.js
+          for f in manifest.json _locales/*/messages.json; do jq empty "$f"; done
+
+      - name: Build ZIP
+        id: build
+        run: |
+          zip=$(./build.sh)
+          echo "zip=$zip" >> "$GITHUB_OUTPUT"
+
+      - name: Upload and submit for review
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+          RELEASE_NOTES: ${{ github.event.release.body }}
+          ZIP: ${{ steps.build.outputs.zip }}
+        run: scripts/amo-publish.sh "$ZIP"

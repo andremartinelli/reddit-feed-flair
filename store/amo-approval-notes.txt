@@ -1,0 +1,5 @@
+No build step: the ZIP is the source as written (content.js, style.css, manifest.json, _locales, icons). Source: https://github.com/andremartinelli/reddit-feed-flair
+
+How to test: open https://www.reddit.com/ (Home, r/popular or r/all). Posts whose flair Reddit hides on these feeds get a badge next to "r/subreddit • time". The content script only runs on www.reddit.com and only fetches www.reddit.com/comments/<id>.json (or the post page as a fallback). It caches the flair in storage.local for 24 hours. No remote code, no other hosts.
+
+No Reddit account is needed: open https://www.reddit.com/r/popular/ logged out and the flair badges show up next to "r/subreddit • time".
