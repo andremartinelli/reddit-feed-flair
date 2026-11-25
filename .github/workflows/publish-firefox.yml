@@ -2,11 +2,12 @@ name: Publish to Firefox Add-ons
 
 # Runs when a GitHub Release is published. The release tag must be "v" + the
 # version in manifest.json (e.g. v1.3.1). The release text becomes the release
-# notes on Firefox Add-ons. Setup: store/automation.md.
+# notes on Firefox Add-ons.
 #
-# The AMO API key lives in the "amo" environment, which only main and v* tags
-# can use. Rulesets keep both admin-only (store/automation.md), so code on other
-# branches can't read the key.
+# Needs the "amo" environment, limited to branch main and tags v*, with the
+# secrets AMO_JWT_ISSUER and AMO_JWT_SECRET (an AMO API key, valid for the whole
+# account). Rulesets keep v* tags and pushes to main admin-only, so code on
+# other branches can't read the key.
 on:
   release:
     types: [published]

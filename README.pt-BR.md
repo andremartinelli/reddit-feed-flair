@@ -67,23 +67,6 @@ Os pontos que dependem do HTML do Reddit:
 
 Erros aparecem no console da página com o prefixo `[Feed Flair for Reddit]`.
 
-## Publicar uma nova versão
-
-1. Mude o código e teste: recarregue a extensão em `brave://extensions` e depois o Reddit. Teste também no Firefox (veja "Instalar").
-2. Aumente `version` no `manifest.json` (por exemplo 1.3.0 → 1.3.1). As duas lojas recusam um pacote com versão que não seja maior que a publicada.
-3. Faça o commit e o push.
-4. Crie um GitHub Release com a tag `v<versão>` e uma nota curta para os usuários, por exemplo `gh release create v1.3.1 --notes "Fixes flair colors in dark mode."`. Dois workflows geram o ZIP e mandam para revisão: **Publish to Chrome Web Store** e **Publish to Firefox Add-ons**. A nota vira as notas da versão no Firefox Add-ons, então escreva para os usuários (o `--generate-notes` poria uma lista de pull requests lá). Configuração e detalhes: `store/automation.md`.
-
-Plano B manual: rode `./build.sh` e envie `dist/feed-flair-for-reddit-<versão>.zip` no [painel da Chrome Web Store](https://chrome.google.com/webstore/devconsole) (aba **Pacote** do item) ou no [Add-on Developer Hub](https://addons.mozilla.org/developers/addons) (**Upload New Version** na página da extensão).
-
-Os textos e respostas das lojas ficam em `store/listing.md` (Chrome) e `store/listing-firefox.md` (Firefox). Se mudar algo num painel, atualize o arquivo correspondente também.
-
-## Sessões do Claude Code na nuvem
-
-`scripts/cloud-setup.sh` prepara uma sessão na nuvem: instala `jq` e `zip` se faltarem e confere o Node, as mesmas ferramentas do CI. É idempotente e não tem nada a configurar: sem serviços, sem `.env`, sem segredos. O hook SessionStart em `.claude/settings.json` só o roda quando `CLAUDE_CODE_REMOTE=true`, então sessões locais não mudam. As instruções para o Claude ficam em `CLAUDE.md`.
-
-A publicação continua só no GitHub Actions; sessões na nuvem nunca recebem credenciais das lojas. A chave do Firefox Add-ons fica no environment `amo`, que só o `main` e as tags `v*` podem usar. Rulesets deixam só admins criarem essas tags ou fazerem push direto no `main` (veja `store/automation.md`), então código de outros branches não consegue ler a chave.
-
 ## Licença
 
 [MIT](LICENSE)

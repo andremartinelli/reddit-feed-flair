@@ -67,23 +67,6 @@ The parts that depend on Reddit's HTML:
 
 Errors show up in the page console with the `[Feed Flair for Reddit]` prefix.
 
-## Releasing a new version
-
-1. Change the code and test it: reload the extension in `brave://extensions`, then reload Reddit. Test it in Firefox too (see "Install").
-2. Raise `version` in `manifest.json` (for example 1.3.0 → 1.3.1). Both stores reject a package whose version isn't higher than the published one.
-3. Commit and push.
-4. Create a GitHub Release with tag `v<version>` and a short note for users, for example `gh release create v1.3.1 --notes "Fixes flair colors in dark mode."`. Two workflows build the ZIP and submit it for review: **Publish to Chrome Web Store** and **Publish to Firefox Add-ons**. The note becomes the release notes on Firefox Add-ons, so write it for users (`--generate-notes` would put a list of pull requests there). Setup and details: `store/automation.md`.
-
-Manual fallback: run `./build.sh` and upload `dist/feed-flair-for-reddit-<version>.zip` in the [Chrome Web Store dashboard](https://chrome.google.com/webstore/devconsole) (the item's **Package** tab) or in the [Add-on Developer Hub](https://addons.mozilla.org/developers/addons) (**Upload New Version** on the add-on's page).
-
-Store texts and answers live in `store/listing.md` (Chrome) and `store/listing-firefox.md` (Firefox). If you change them in a dashboard, update the matching file too.
-
-## Claude Code cloud sessions
-
-`scripts/cloud-setup.sh` prepares a cloud session: it installs `jq` and `zip` if missing and checks for Node, the same tools CI uses. It is idempotent and has nothing to configure: no services, no `.env`, no secrets. The SessionStart hook in `.claude/settings.json` runs it only when `CLAUDE_CODE_REMOTE=true`, so local sessions are unchanged. Instructions for Claude live in `CLAUDE.md`.
-
-Publishing stays in GitHub Actions; cloud sessions never get store credentials. The Firefox Add-ons key lives in the `amo` environment, which only `main` and `v*` tags can use. Rulesets let only admins create those tags or push straight to `main` (see `store/automation.md`), so code on other branches can't read the key.
-
 ## License
 
 [MIT](LICENSE)
