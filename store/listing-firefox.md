@@ -6,7 +6,7 @@ Decided on 2026-11-24:
 
 - Add-on ID: `feed-flair@andremartinelli`. AMO ties the listing to this ID, so it can never change.
 - Firefox desktop only (140 or later). Firefox for Android isn't tested.
-- Manual upload in the Developer Hub. There's no publishing workflow for Firefox.
+- The first version was uploaded by hand in the Developer Hub. Later versions go out through the "Publish to Firefox Add-ons" workflow when a GitHub Release is published (decided 2026-11-25; see `store/automation.md`).
 - Data collection: `"required": ["none"]`. This is the same answer as in the Chrome Web Store: nothing leaves the browser except the requests to www.reddit.com that the page itself makes.
 
 ## Before the first upload
@@ -53,15 +53,7 @@ https://github.com/andremartinelli/reddit-feed-flair/issues
 
 **Privacy policy:** check "This add-on has a privacy policy" and paste the English part of `PRIVACY.md`, from "Feed Flair for Reddit does not collect" to the Contact section.
 
-**Notes to reviewer:**
-
-```
-No build step: the ZIP is the source as written (content.js, style.css, manifest.json, _locales, icons). Source: https://github.com/andremartinelli/reddit-feed-flair
-
-How to test: open https://www.reddit.com/ (Home, r/popular or r/all). Posts whose flair Reddit hides on these feeds get a badge next to "r/subreddit • time". The content script only runs on www.reddit.com and only fetches www.reddit.com/comments/<id>.json (or the post page as a fallback). It caches the flair in storage.local for 24 hours. No remote code, no other hosts.
-
-No Reddit account is needed: open https://www.reddit.com/r/popular/ logged out and the flair badges show up next to "r/subreddit • time".
-```
+**Notes to reviewer:** paste the contents of `store/amo-approval-notes.txt`. The publishing workflow sends the same file with every new version, so edit it there.
 
 Never put a real Reddit username or password here. AMO's checklist asks for a test account only when one is needed, and this extension doesn't need one.
 
@@ -86,6 +78,10 @@ First release on Firefox Add-ons. Shows each post's flair on Reddit's Home, Popu
 
 ## New versions
 
+Publishing a GitHub Release sends them automatically: see `store/automation.md`. The release text becomes the release notes, and `store/amo-approval-notes.txt` becomes the notes to reviewer.
+
+Manual fallback:
+
 1. Raise `version` in `manifest.json`. AMO rejects a version that isn't higher than the published one.
 2. Run `./build.sh`.
-3. In the Developer Hub, open the add-on and click **Upload New Version**. Give the same answers as above: Firefox only, no source code. Write release notes about what changed, and keep the notes to reviewer.
+3. In the Developer Hub, open the add-on and click **Upload New Version**. Give the same answers as above: Firefox only, no source code. Write release notes about what changed, and paste `store/amo-approval-notes.txt` as the notes to reviewer.

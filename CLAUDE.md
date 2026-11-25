@@ -20,8 +20,10 @@ runs from the SessionStart hook in `.claude/settings.json` only when
 
 ## Production is off limits
 
-- Never create a GitHub Release or tag, and never run the "Publish to Chrome
-  Web Store" workflow (`.github/workflows/publish.yml`), not even its check job.
+- Never create a GitHub Release or tag, and never run the publishing
+  workflows, not even their check jobs: "Publish to Chrome Web Store"
+  (`.github/workflows/publish.yml`) and "Publish to Firefox Add-ons"
+  (`.github/workflows/publish-firefox.yml`).
 - Never run `scripts/cws-publish.sh` or call the Chrome Web Store API.
 - Don't offer to fill in the Chrome Web Store developer dashboard: no browser
   Claude has can operate it (the app's browser doesn't load the page, and
@@ -30,8 +32,9 @@ runs from the SessionStart hook in `.claude/settings.json` only when
   `store/listing.md`, then give the owner a numbered list of steps to do in
   the dashboard.
 - Never submit to Firefox Add-ons (addons.mozilla.org) or call its API,
-  including `web-ext sign`.
-- Never ask for, print or store secrets or the `GCP_*`/`CWS_*` values.
+  including `web-ext sign` and `scripts/amo-publish.sh`. Testing that script
+  against a local fake server through `AMO_API` is fine.
+- Never ask for, print or store secrets or the `GCP_*`/`CWS_*`/`AMO_*` values.
 - Don't raise `version` in `manifest.json` unless asked.
 
 ## Working rules
