@@ -57,7 +57,10 @@ jobs:
 
       - name: Build ZIP
         id: build
-        run: echo "zip=$(./build.sh)" >> "$GITHUB_OUTPUT"
+        # Two lines: in one, a failed build would still write an empty path and pass.
+        run: |
+          zip=$(./build.sh)
+          echo "zip=$zip" >> "$GITHUB_OUTPUT"
 
       - name: Get a Chrome Web Store token
         id: auth
